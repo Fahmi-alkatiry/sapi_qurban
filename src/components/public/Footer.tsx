@@ -19,7 +19,7 @@ export default function Footer() {
         {/* Branding & Info */}
         <div className="space-y-6">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="Logo Daeng Makku" className="h-14 w-auto brightness-0 invert" />
+            <img src="/logo.png" alt="Logo Daeng Makku" className="h-14 w-auto" />
             <div>
               <p className="font-bold text-white text-xl">Daengmakku Cattle</p>
               <p className="text-emerald-300 text-sm">Sapi Qurban Berkualitas</p>
