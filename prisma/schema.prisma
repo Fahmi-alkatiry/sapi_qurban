@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Cattle {
+  id           String   @id @default(cuid())
+  tagNumber    String   @unique
+  breed        String
+  weight       Float    // Dalam KG
+  ageInMonths  Int      // Disimpan dalam bulan untuk kemudahan filtering
+  price        Decimal
+  youtubeId    String?  // ID Video YouTube
+  imageUrls    Json     // Array of URL strings disimpan dalam format JSON native
+  status       Status   @default(AVAILABLE)
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt // Melacak perubahan terakhir (misal: saat terjual)
+}
+
+enum Status {
+  AVAILABLE
+  SOLD
+}
+
+model User {
+  id       String @id @default(cuid())
+  username String @unique
+  password String // Hashed password
+}
