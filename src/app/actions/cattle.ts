@@ -38,7 +38,11 @@ export async function createCattle(formData: FormData) {
     const weight = parseFloat(formData.get("weight") as string);
     const ageInMonths = parseInt(formData.get("ageInMonths") as string);
     const price = formData.get("price") as string;
-    const youtubeId = formData.get("youtubeId") as string | null;
+    const youtubeUrlsString = formData.get("youtubeUrls") as string;
+    const rawYoutubeUrls = youtubeUrlsString ? JSON.parse(youtubeUrlsString) : [];
+    const youtubeUrls = Array.isArray(rawYoutubeUrls) 
+      ? rawYoutubeUrls.map((url: string) => extractYoutubeId(url)).filter(Boolean) 
+      : [];
     const imageUrlsString = formData.get("imageUrls") as string;
     const imageUrls = imageUrlsString ? JSON.parse(imageUrlsString) : [];
 
@@ -49,7 +53,7 @@ export async function createCattle(formData: FormData) {
         weight,
         ageInMonths,
         price,
-        youtubeId: extractYoutubeId(youtubeId),
+        youtubeUrls,
         imageUrls,
       },
     });
@@ -74,7 +78,11 @@ export async function updateCattle(id: string, formData: FormData) {
     const weight = parseFloat(formData.get("weight") as string);
     const ageInMonths = parseInt(formData.get("ageInMonths") as string);
     const price = formData.get("price") as string;
-    const youtubeId = formData.get("youtubeId") as string | null;
+    const youtubeUrlsString = formData.get("youtubeUrls") as string;
+    const rawYoutubeUrls = youtubeUrlsString ? JSON.parse(youtubeUrlsString) : [];
+    const youtubeUrls = Array.isArray(rawYoutubeUrls) 
+      ? rawYoutubeUrls.map((url: string) => extractYoutubeId(url)).filter(Boolean) 
+      : [];
     const imageUrlsString = formData.get("imageUrls") as string;
     const imageUrls = imageUrlsString ? JSON.parse(imageUrlsString) : [];
 
@@ -86,7 +94,7 @@ export async function updateCattle(id: string, formData: FormData) {
         weight,
         ageInMonths,
         price,
-        youtubeId: extractYoutubeId(youtubeId),
+        youtubeUrls,
         imageUrls,
         // Status is NOT updated here — use the dedicated "Tandai Terjual" button
       },

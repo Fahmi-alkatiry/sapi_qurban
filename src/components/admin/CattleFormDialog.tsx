@@ -15,8 +15,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createCattle, updateCattle } from "@/app/actions/cattle";
 import { toast } from "sonner";
-import { Plus, X, UploadCloud } from "lucide-react";
+import { Plus, X, UploadCloud, Video } from "lucide-react";
 import { CldUploadWidget } from "next-cloudinary";
+import { extractYoutubeId } from "@/lib/utils";
 
 interface CattleFormDialogProps {
   cattle?: SerializedCattle;
@@ -31,12 +32,19 @@ export function CattleFormDialog({ cattle, open: externalOpen, onOpenChange }: C
   
   const [loading, setLoading] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [youtubeUrls, setYoutubeUrls] = useState<string[]>([]);
+  const [newYtInput, setNewYtInput] = useState("");
 
   useEffect(() => {
     if (cattle && open) {
       setImageUrls(typeof cattle.imageUrls === "string" ? JSON.parse(cattle.imageUrls) : (cattle.imageUrls as string[]) || []);
+      
+      // @ts-ignore - Handle old or new prisma schema type gracefully
+      const ytUrls = cattle.youtubeUrls;
+      setYoutubeUrls(typeof ytUrls === "string" ? JSON.parse(ytUrls) : (ytUrls as string[]) || []);
     } else if (!cattle && open) {
       setImageUrls([]);
+      setYoutubeUrls([]);
     }
   }, [cattle, open]);
 
@@ -46,6 +54,7 @@ export function CattleFormDialog({ cattle, open: externalOpen, onOpenChange }: C
     
     const formData = new FormData(e.currentTarget);
     formData.append("imageUrls", JSON.stringify(imageUrls));
+    formData.append("youtubeUrls", JSON.stringify(youtubeUrls));
 
     let res;
     if (cattle) {
@@ -115,9 +124,51 @@ export function CattleFormDialog({ cattle, open: externalOpen, onOpenChange }: C
               <Label htmlFor="price">Harga (Rp)</Label>
               <Input id="price" name="price" type="number" defaultValue={cattle?.price?.toString()} required placeholder="Contoh: 25000000" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="youtubeId">Video YouTube (Link atau ID)</Label>
-              <Input id="youtubeId" name="youtubeId" defaultValue={cattle?.youtubeId || ""} placeholder="Contoh: https://www.youtube.com/watch?v=... atau dQw4w9WgXcQ" />
+            <div className="space-y-2 col-span-1 sm:col-span-2">
+              <Label>Video YouTube</Label>
+              <div className="flex flex-wrap gap-4 mb-3">
+                {youtubeUrls.map((url, index) => {
+                  const ytId = extractYoutubeId(url);
+                  return (
+                    <div key={index} className="relative w-32 h-24 rounded-md border border-gray-200 overflow-hidden group">
+                      {ytId ? (
+                        <img src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`} alt={`YouTube Preview ${index}`} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                          <Video className="w-8 h-8 text-gray-400" />
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setYoutubeUrls(youtubeUrls.filter((_, i) => i !== index))}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex gap-2 items-center">
+                <Input 
+                  value={newYtInput}
+                  onChange={(e) => setNewYtInput(e.target.value)}
+                  placeholder="Paste link YouTube di sini..."
+                  className="flex-1"
+                />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => {
+                    if (newYtInput.trim()) {
+                      setYoutubeUrls([...youtubeUrls, newYtInput.trim()]);
+                      setNewYtInput("");
+                    }
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-2" /> Tambah Video
+                </Button>
+              </div>
               <p className="text-xs text-gray-500">Anda bisa memasukkan link video penuh atau hanya ID-nya saja.</p>
             </div>
           </div>

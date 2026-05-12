@@ -14,7 +14,7 @@ model Cattle {
   weight       Float    // Dalam KG
   ageInMonths  Int      // Disimpan dalam bulan untuk kemudahan filtering
   price        Decimal
-  youtubeId    String?  // ID Video YouTube
+  youtubeUrls  Json?      // Array of YouTube IDs
   imageUrls    Json     // Array of URL strings disimpan dalam format JSON native
   status       Status   @default(AVAILABLE)
   

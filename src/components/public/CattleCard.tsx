@@ -16,6 +16,13 @@ export default function CattleCard({ cattle }: CattleCardProps) {
       ? JSON.parse(cattle.imageUrls)
       : (cattle.imageUrls as string[]) || [];
 
+  // @ts-ignore
+  const rawYtUrls = cattle.youtubeUrls;
+  const youtubeUrls =
+    typeof rawYtUrls === "string"
+      ? JSON.parse(rawYtUrls)
+      : (rawYtUrls as string[]) || [];
+
   const firstImage = imageUrls[0] || null;
 
   const formatAge = (months: number) => {
@@ -59,7 +66,7 @@ export default function CattleCard({ cattle }: CattleCardProps) {
         </div>
 
         {/* Has video badge */}
-        {cattle.youtubeId && (
+        {youtubeUrls.length > 0 && (
           <div className="absolute top-3 right-3">
             <span className="bg-red-500 text-white text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm">
               📹 Video

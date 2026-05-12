@@ -18,6 +18,13 @@ export default function CattleDetailClient({ cattle }: CattleDetailClientProps) 
       ? JSON.parse(cattle.imageUrls)
       : (cattle.imageUrls as string[]) || [];
 
+  // @ts-ignore
+  const rawYtUrls = cattle.youtubeUrls;
+  const youtubeUrls =
+    typeof rawYtUrls === "string"
+      ? JSON.parse(rawYtUrls)
+      : (rawYtUrls as string[]) || [];
+
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -109,21 +116,24 @@ export default function CattleDetailClient({ cattle }: CattleDetailClientProps) 
           )}
 
           {/* YouTube Video */}
-          {cattle.youtubeId && (
-            <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
+          {/* YouTube Video */}
+          {youtubeUrls.length > 0 && (
+            <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm space-y-4">
               <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                 <span className="text-red-500 text-lg">▶</span>
-                Video Penimbangan
+                Video Penimbangan ({youtubeUrls.length})
               </h3>
-              <div className="aspect-video rounded-xl overflow-hidden">
-                <iframe
-                  src={`https://www.youtube.com/embed/${cattle.youtubeId}`}
-                  title="Video Penimbangan Sapi"
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
+              {youtubeUrls.map((ytId: string, idx: number) => (
+                <div key={idx} className="aspect-video rounded-xl overflow-hidden">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${ytId}`}
+                    title={`Video Penimbangan Sapi ${idx + 1}`}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -185,7 +195,7 @@ export default function CattleDetailClient({ cattle }: CattleDetailClientProps) 
           <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-sm text-emerald-800">
             <p className="font-semibold mb-1">🎥 Transparansi Penimbangan</p>
             <p className="text-emerald-700">
-              {cattle.youtubeId
+              {youtubeUrls.length > 0
                 ? "Video penimbangan tersedia. Bobot yang tertera adalah hasil timbangan langsung yang bisa Anda saksikan."
                 : "Foto dokumentasi asli sapi ini tersedia di katalog kami."}
             </p>
